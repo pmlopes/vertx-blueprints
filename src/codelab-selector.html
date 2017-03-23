@@ -1,0 +1,87 @@
+<html><head><link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+
+<link rel="import" href="elements/codelab-card.html">
+
+</head><body><dom-module id="codelab-selector">
+
+  <template>
+
+    <style include="iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+      }
+      paper-tabs {
+        --paper-tabs-selection-bar-color: var(--app-primary-color);
+      }
+      paper-tab {
+        --paper-tab-ink: var(--app-primary-color);
+      }
+      .content {
+        padding: 10px;
+      }
+      codelab-card {
+        margin: 10px;
+        max-width: 380px;
+      }
+      .event-wrapper {
+        background-color: white;
+        padding: 10px;
+      }
+      .event-logo {
+        min-width: 200px;
+      }
+      .event-description {
+        margin-left: 20px;
+      }
+    </style>
+
+    <div>
+      <template is="dom-if" if="{{currentEvent.id}}">
+        <header class="horizontal layout event-wrapper">
+          <img class="event-logo" src="/images/events/{{currentEvent.logo}}">
+          <div class="event-description">
+            <h1>{{currentEvent.name}}</h1>
+            <p>{{currentEvent.description}}</p>
+          </div>
+        
+      </header></template>
+      <div class="content">
+        <div class="horizontal layout end">
+          <paper-tabs selected="{{filteringMethod}}">
+            <paper-tab>DIFFICULTY</paper-tab>
+            <paper-tab>RECENT</paper-tab>
+            <paper-tab>DURATION</paper-tab>
+          </paper-tabs>
+          <div class="flex"></div>
+          <paper-dropdown-menu label="Category" value="{{selectedcategory}}">
+            <paper-listbox class="dropdown-content" selected="0">
+              <template is="dom-repeat" items="[[categories]]">
+                <paper-item>[[item]]</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
+        </div>
+        <div class="horizontal layout wrap">
+          <template is="dom-repeat" items="[[codelabs]]" filter="{{codelabfromscope(currentEvent, listofkeywords, selectedcategory)}}" sort="{{_sortcodelabs(filteringMethod)}}">
+            <codelab-card title="[[item.title]]" summary="[[item.summary]]" category="[[item.category]]" difficulty="[[item.difficulty]]" duration="[[item.duration}}" tags="[[item.tags]]" updated="[[item.updated]]" url="[[item.url]]" currenturl="[[eventRoute.prefix]][[eventRoute.path]]" categoriesmap="[[categoriesmap]]"></codelab-card>
+          </template>
+        </div>
+      </div>
+      <iron-ajax auto="" url="/api/codelabs.json" handle-as="json" on-response="_codelabsInfoHandler">
+      <app-route route="{{eventRoute}}" pattern="/:event" data="{{routeData}}"></app-route>
+    </iron-ajax></div>
+
+  </template>
+
+  <script>Polymer({is:"codelab-selector",properties:{codelabs:{type:Array,value:function(){return[]}},categoriesmap:Object,eventsmap:Object,currentSearch:{type:String,observer:"_updatekeywords"},listofkeywords:{type:Array,value:function(){return[]}},categories:{type:Array,computed:"_buildcategories(categoriesmap)"},eventRoute:String,currentEvent:{type:Object,value:{},computed:"_eventChanged(routeData.event, eventsmap)"},filteringMethod:{type:Number,value:0}},_eventChanged:function(e,t){if(this.classList.contains("iron-selected")){if("web"==e)return{};var r={id:e};return r.name=t[e].name,r.logo=t[e].logo,r.description=t[e].description,r}},codelabfromscope:function(e,t,r){return function(n){var o=n.title.toLowerCase(),i=n.summary.toLowerCase(),s=n.category[0].toLowerCase(),a=n.tags;if(e.id&&a.indexOf(e.id)<0)return!1;if(r!==s&&"All"!==r)return!1;if(0===t.length)return!0;var c=!0;return t.forEach(function(e){var t=!1;o.indexOf(e)===-1&&i.indexOf(e)===-1&&s.indexOf(e)===-1||(t=!0),a.forEach(function(r){r.toLowerCase().indexOf(e)!==-1&&(t=!0)},this),c=c&&t},this),c}},_sortcodelabs:function(e){switch(e){case 0:return function(e,t){return e.difficulty>t.difficulty};case 1:return function(e,t){return e.updated>t.updated};case 2:return function(e,t){return e.duration>t.duration}}},_codelabsInfoHandler:function(e){this.categoriesmap=e.detail.response.categories,this.eventsmap=e.detail.response.events,e.detail.response.codelabs.forEach(function(e){this.push("codelabs",e)},this)},_updatekeywords:function(){void 0!==this.listofkeywords&&(this.listofkeywords=[],this.currentSearch.split(" ").forEach(function(e){this.listofkeywords.push(e.toLowerCase())},this))},_buildcategories:function(e){var t=Object.keys(e).sort();t.unshift("All");var r=t.indexOf("unknown");return r>-1&&t.splice(r,1),t}});</script>
+
+</dom-module>
+</body></html>

@@ -1,0 +1,24 @@
+<html><head><link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+
+</head><body><dom-module id="my-codelabs">
+
+  <template>
+    <style>
+      :host {
+        display: block;
+        height: 100vh;
+      }
+    </style>
+
+    <app-route route="{{route}}" pattern="/:codelab" data="{{routeData}}" tail="{{routeTail}}"></app-route>
+
+      <iron-pages id="codelabwrapper" role="main" selected="[[codelab]]" attr-for-selected="name">
+      </iron-pages>
+
+  </template>
+
+  <script>Polymer({is:"my-codelabs",properties:{codelab:{type:String,reflectToAttribute:!0},route:{type:String,reflectToAttribute:!0}},observers:["_codelabChanged(routeData.codelab)"],_codelabChanged:function(e){if(this.classList.contains("iron-selected")){this.codelab=e;var t=this.importHref(this.resolveUrl("codelabs/"+e+"/index.vertx-template.html"),function(){if(t){var r=document.createElement(e);r.setAttribute("name",e),r.route=this.routeTail,Polymer.dom(this.$.codelabwrapper).appendChild(r)}},null,!0)}}});</script>
+
+</dom-module>
+</body></html>
