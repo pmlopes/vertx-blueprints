@@ -1,0 +1,5 @@
+bower_components
+node_modules
+build
+# ignore the generated code
+website/src/codelabs/
