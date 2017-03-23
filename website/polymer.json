@@ -5,5 +5,15 @@
     "src/my-view1.html",
     "src/my-view2.html",
     "src/my-view3.html"
+  ],
+  "sources": [
+    "api/**/*",
+    "images/**/*",
+    "src/codelabs/**/*"
+  ],
+  "includeDependencies": [
+    "bower_components/webcomponentsjs/webcomponents-lite.min.js",
+    "bower.json",
+    "manifest.json"
   ]
 }
